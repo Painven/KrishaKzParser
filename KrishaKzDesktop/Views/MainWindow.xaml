@@ -1,49 +1,158 @@
-﻿<Window x:Class="KrishaKzDesktop.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:KrishaKzDesktop.ViewModels"
-        xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
-        mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=True}"
-        Title="Парсер сайта www.krisha.kz" Height="300" Width="600">
+﻿<Window
+    x:Class="KrishaKzDesktop.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:KrishaKzDesktop.ViewModels"
+    Title="Парсер сайта www.krisha.kz"
+    Width="600"
+    Height="300"
+    d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel,
+                                     IsDesignTimeCreatable=True}"
+    mc:Ignorable="d">
     <Window.Resources>
         <Style TargetType="Button">
-            <Setter Property="Margin" Value="2 2 4 2"/>
-            <Setter Property="Padding" Value="2"/>
-            <Setter Property="Foreground" Value="Navy"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Margin" Value="2,2,4,2" />
+            <Setter Property="Padding" Value="2" />
+            <Setter Property="Foreground" Value="Navy" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
         </Style>
         <Style TargetType="{x:Type icons:PackIconFontAwesome}">
-            <Setter Property="Width" Value="22"/>
-            <Setter Property="Height" Value="22"/>
-            <Setter Property="Foreground" Value="Navy"/>
+            <Setter Property="Width" Value="22" />
+            <Setter Property="Height" Value="22" />
+            <Setter Property="Foreground" Value="Navy" />
         </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="2">
-            <Button Command="{Binding CustomCommand}">
+        <StackPanel
+            Grid.Row="0"
+            Margin="2"
+            Orientation="Horizontal">
+            <Button Command="{Binding StartParserCommand}">
                 <StackPanel Orientation="Horizontal">
-                    <icons:PackIconFontAwesome Kind="SpiderSolid"/>
-                    <TextBlock Margin="8 2 2 2" VerticalAlignment="Center">Запустить парсинг</TextBlock>
+                    <icons:PackIconFontAwesome Kind="SpiderSolid" />
+                    <TextBlock Margin="8,2,2,2" VerticalAlignment="Center">Запустить парсинг</TextBlock>
                 </StackPanel>
-
-
             </Button>
         </StackPanel>
 
         <Grid Grid.Row="1" Margin="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
+            <GroupBox Header="Фильтр поиска парсера">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Content="Цена, тг за месяц" />
+                    <DockPanel
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Margin="10,20"
+                        LastChildFill="True">
+                        <StackPanel
+                            VerticalAlignment="Center"
+                            DockPanel.Dock="Right"
+                            Orientation="Horizontal">
+                            <TextBlock Text="{Binding MinimumPrice, FallbackValue=0}" />
+                            <TextBlock Margin="5,0" Text="-" />
+                            <TextBlock Text="{Binding MaximumPrice, FallbackValue=0}" />
+                        </StackPanel>
+                        <mah:RangeSlider
+                            LowerValue="{Binding MinimumPrice, UpdateSourceTrigger=PropertyChanged}"
+                            Maximum="500000"
+                            Minimum="50000"
+                            UpperValue="{Binding MaximumPrice, UpdateSourceTrigger=PropertyChanged}" />
+                    </DockPanel>
+
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Content="Размер квартиры, М^2" />
+                    <DockPanel
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Margin="10,20"
+                        LastChildFill="True">
+                        <StackPanel
+                            VerticalAlignment="Center"
+                            DockPanel.Dock="Right"
+                            Orientation="Horizontal">
+                            <TextBlock Text="{Binding MinimumArea, FallbackValue=0}" />
+                            <TextBlock Margin="5,0" Text="-" />
+                            <TextBlock Text="{Binding MaximumArea, FallbackValue=0}" />
+                        </StackPanel>
+                        <mah:RangeSlider
+                            LowerValue="{Binding MinimumArea, UpdateSourceTrigger=PropertyChanged}"
+                            Maximum="100"
+                            Minimum="10"
+                            UpperValue="{Binding MaximumArea, UpdateSourceTrigger=PropertyChanged}" />
+                    </DockPanel>
+
+
+                    <CheckBox
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Content="Квартира полностью мебелирована"
+                        IsChecked="{Binding IsLivingRoomWithFurniture}" />
+
+                    <DockPanel Grid.Row="2" Grid.Column="1">
+                        <TextBox
+                            MinWidth="50"
+                            HorizontalContentAlignment="Left"
+                            VerticalContentAlignment="Center"
+                            Text="{Binding LivingRoomsCount, FallbackValue=0}" />
+                        <Label VerticalAlignment="Center" Content="Количество комнат" />
+
+                    </DockPanel>
+
+
+                </Grid>
+            </GroupBox>
         </Grid>
 
-        <ProgressBar Grid.Row="2" Height="24" Margin="2"></ProgressBar>
+        <Grid
+            Grid.Row="2"
+            Height="24"
+            Margin="2">
+            <ProgressBar
+                Maximum="{Binding TotalPages}"
+                Minimum="0"
+                Value="{Binding CurrentPage}" />
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <TextBlock Text="{Binding CurrentPage}" />
+                <TextBlock
+                    Margin="5,2"
+                    VerticalAlignment="Center"
+                    Text="-" />
+                <TextBlock Text="{Binding TotalPages}" />
+            </StackPanel>
+        </Grid>
+
     </Grid>
 </Window>
