@@ -76,51 +76,45 @@
                     <Label
                         Grid.Row="0"
                         Grid.Column="0"
-                        Content="Цена, тг за месяц" />
+                        HorizontalAlignment="Center"
+                        Content="Цена, тг за месяц"
+                        FontWeight="Bold" />
                     <DockPanel
                         Grid.Row="1"
                         Grid.Column="0"
                         Margin="10,20"
                         LastChildFill="True">
                         <StackPanel
+                            HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             DockPanel.Dock="Right"
                             Orientation="Horizontal">
-                            <TextBlock Text="{Binding MinimumPrice, FallbackValue=0}" />
+                            <TextBox Text="{Binding MinimumPrice, FallbackValue=0}" />
                             <TextBlock Margin="5,0" Text="-" />
-                            <TextBlock Text="{Binding MaximumPrice, FallbackValue=0}" />
+                            <TextBox Text="{Binding MaximumPrice, FallbackValue=0}" />
                         </StackPanel>
-                        <mah:RangeSlider
-                            LargeChange="10000"
-                            LowerValue="{Binding MinimumPrice, UpdateSourceTrigger=PropertyChanged}"
-                            Maximum="500000"
-                            Minimum="50000"
-                            SmallChange="1000"
-                            UpperValue="{Binding MaximumPrice, UpdateSourceTrigger=PropertyChanged}" />
                     </DockPanel>
 
                     <Label
                         Grid.Row="0"
                         Grid.Column="1"
-                        Content="Размер квартиры, М^2" />
+                        HorizontalAlignment="Center"
+                        Content="Размер квартиры, М^2"
+                        FontWeight="Bold" />
                     <DockPanel
                         Grid.Row="1"
                         Grid.Column="1"
                         Margin="10,20"
                         LastChildFill="True">
                         <StackPanel
+                            HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             DockPanel.Dock="Right"
                             Orientation="Horizontal">
-                            <TextBlock Text="{Binding MinimumArea, FallbackValue=0}" />
+                            <TextBox Text="{Binding MinimumArea, FallbackValue=0}" />
                             <TextBlock Margin="5,0" Text="-" />
-                            <TextBlock Text="{Binding MaximumArea, FallbackValue=0}" />
+                            <TextBox Text="{Binding MaximumArea, FallbackValue=0}" />
                         </StackPanel>
-                        <mah:RangeSlider
-                            LowerValue="{Binding MinimumArea, UpdateSourceTrigger=PropertyChanged}"
-                            Maximum="100"
-                            Minimum="10"
-                            UpperValue="{Binding MaximumArea, UpdateSourceTrigger=PropertyChanged}" />
                     </DockPanel>
 
 
@@ -129,15 +123,22 @@
                         Grid.Column="0"
                         VerticalAlignment="Center"
                         Content="Квартира полностью мебелирована"
+                        FontWeight="Bold"
                         IsChecked="{Binding IsLivingRoomWithFurniture}" />
 
                     <DockPanel Grid.Row="2" Grid.Column="1">
+                        <Label
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Content="Количество комнат"
+                            FontWeight="Bold" />
                         <TextBox
                             MinWidth="50"
+                            HorizontalAlignment="Center"
                             HorizontalContentAlignment="Left"
                             VerticalContentAlignment="Center"
                             Text="{Binding LivingRoomsCount, FallbackValue=0}" />
-                        <Label VerticalAlignment="Center" Content="Количество комнат" />
+
 
                     </DockPanel>
 

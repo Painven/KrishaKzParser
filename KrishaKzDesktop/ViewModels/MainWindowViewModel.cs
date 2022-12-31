@@ -108,7 +108,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         StartParserCommand = new LambdaCommand(async e => await StartParser(), e => CurrentPage == 1);
         MovePreviousCommand = new LambdaCommand(e => CurrentPage--, e => CurrentPage > 1);
-        MoveNextCommand = new LambdaCommand(e => CurrentPage++, e => CurrentPage < TotalPages - 1);
+        MoveNextCommand = new LambdaCommand(e => CurrentPage++, e => CurrentPage < TotalPages);
 
         LoadStoredFilesList();
     }
