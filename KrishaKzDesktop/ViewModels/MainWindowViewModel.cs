@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using static KrishaKzDesktop.KrishaParser;
 
 namespace KrishaKzDesktop.ViewModels;
 public class MainWindowViewModel : ViewModelBase
@@ -62,23 +66,87 @@ public class MainWindowViewModel : ViewModelBase
         set => Set(ref isLivingRoomWithFurniture, value);
     }
 
-    ParserManager manager = new ParserManager();
+    int selectedItemPage = 1;
+    public int SelectedItemPage
+    {
+        get => selectedItemPage;
+        set
+        {
+            if (Set(ref selectedItemPage, value))
+            {
+                RaisePropertyChanged(nameof(ParsedFilteredAppartments));
+            }
+        }
+    }
+
+    public int ItemsTotalPages
+    {
+        get => (int)Math.Ceiling((double)ParsedAppartments.Count / ITEMS_PER_PAGE);
+    }
+
+    const int ITEMS_PER_PAGE = 20;
+
+    public ObservableCollection<Appartment> ParsedAppartments { get; set; } = new();
+    public IEnumerable<Appartment> ParsedFilteredAppartments
+    {
+        get => ParsedAppartments.Skip(ITEMS_PER_PAGE * (SelectedItemPage - 1)).Take(ITEMS_PER_PAGE);
+    }
+
+    private readonly ParserManager manager;
 
     public ICommand StartParserCommand { get; }
+    public ICommand MovePreviousCommand { get; }
+    public ICommand MoveNextCommand { get; }
 
     public MainWindowViewModel()
     {
         StartParserCommand = new LambdaCommand(async e => await StartParser(), e => CurrentPage == 1);
+        MovePreviousCommand = new LambdaCommand(e => SelectedItemPage--, e => SelectedItemPage > 1);
+        MoveNextCommand = new LambdaCommand(e => SelectedItemPage++, e => SelectedItemPage < ItemsTotalPages - 1);
+        manager = new ParserManager();
+
+        LoadItems();
+
+        ParsedAppartments.CollectionChanged += (o, e) => RaisePropertyChanged(nameof(ItemsTotalPages));
+        RaisePropertyChanged(nameof(ItemsTotalPages));
     }
 
     private async Task StartParser()
     {
-        await manager.Parse(new Progress<Tuple<int, int>>(v =>
+        try
         {
-            CurrentPage = v.Item1;
-            TotalPages = v.Item2;
-        }));
+            var progress =
+                new Progress<Tuple<int, int>>(v =>
+                {
+                    CurrentPage = v.Item1;
+                    TotalPages = v.Item2;
+                });
 
-        CurrentPage = 1;
+            await manager.Parse(
+                minPrice: MinimumPrice, maxPrice: MaximumPrice,
+                minArea: MinimumArea, maxArea: MaximumArea,
+                withFurniture: IsLivingRoomWithFurniture,
+                roomsCount: LivingRoomsCount,
+                progress);
+
+            LoadItems();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Ошибка\r\n" + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            CurrentPage = 1;
+        }
+
+    }
+
+    private void LoadItems()
+    {
+        foreach (var product in manager.appartments)
+        {
+            ParsedAppartments.Add(product);
+        }
     }
 }

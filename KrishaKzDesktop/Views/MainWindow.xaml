@@ -8,8 +8,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:KrishaKzDesktop.ViewModels"
     Title="Парсер сайта www.krisha.kz"
-    Width="600"
-    Height="300"
+    Width="891"
+    Height="485"
     d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel,
                                      IsDesignTimeCreatable=True}"
     mc:Ignorable="d">
@@ -52,7 +52,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <GroupBox Header="Фильтр поиска парсера">
+            <Expander Header="Фильтр поиска парсера" IsExpanded="False">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -133,7 +133,72 @@
 
 
                 </Grid>
-            </GroupBox>
+            </Expander>
+
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button
+                        BorderBrush="#FFC9F2"
+                        Command="{Binding MovePreviousCommand}"
+                        Content="Предыдущая страница" />
+                    <TextBlock
+                        Margin="8,4"
+                        HorizontalAlignment="Center"
+                        FontSize="20"
+                        FontWeight="Bold">
+                        Галерея
+                    </TextBlock>
+                    <Button
+                        BorderBrush="#FFC9F2"
+                        Command="{Binding MoveNextCommand}"
+                        Content="Следующая страница" />
+                </StackPanel>
+
+                <ScrollViewer Grid.Row="1">
+                    <ItemsControl
+                        ItemsSource="{Binding ParsedFilteredAppartments}"
+                        ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                        ScrollViewer.VerticalScrollBarVisibility="Visible">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="8,4" Padding="4">
+                                    <Grid>
+                                        <Button
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Top"
+                                            Panel.ZIndex="99"
+                                            Background="Transparent"
+                                            BorderBrush="Transparent"
+                                            Command="{Binding OpenInBrowserCommand}"
+                                            FontSize="18"
+                                            Foreground="Blue"
+                                            ToolTip="{Binding Name}">
+                                            Ссылка
+                                        </Button>
+                                        <Image
+                                            Width="280"
+                                            Height="175"
+                                            Source="{Binding PreviewImage}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    IsItemsHost="True" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
         </Grid>
 
         <Grid
@@ -144,13 +209,13 @@
                 Maximum="{Binding TotalPages}"
                 Minimum="0"
                 Value="{Binding CurrentPage}" />
-            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                <TextBlock Text="{Binding CurrentPage}" />
-                <TextBlock
-                    Margin="5,2"
-                    VerticalAlignment="Center"
-                    Text="-" />
-                <TextBlock Text="{Binding TotalPages}" />
+            <StackPanel
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Orientation="Horizontal">
+                <TextBlock Text="{Binding CurrentPage, FallbackValue=0}" />
+                <TextBlock Margin="5,2" Text="/" />
+                <TextBlock Text="{Binding TotalPages, FallbackValue=0}" />
             </StackPanel>
         </Grid>
 
