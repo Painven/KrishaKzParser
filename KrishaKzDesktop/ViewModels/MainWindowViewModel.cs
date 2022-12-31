@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -56,7 +58,13 @@ public class MainWindowViewModel : ViewModelBase
     public int CurrentPage
     {
         get => currentPage;
-        set => Set(ref currentPage, value);
+        set
+        {
+            if (Set(ref currentPage, value) && ParsedAppartments.Any())
+            {
+                RaisePropertyChanged(nameof(ParsedFilteredAppartments));
+            }
+        }
     }
 
     bool isLivingRoomWithFurniture = true;
@@ -66,33 +74,31 @@ public class MainWindowViewModel : ViewModelBase
         set => Set(ref isLivingRoomWithFurniture, value);
     }
 
-    int selectedItemPage = 1;
-    public int SelectedItemPage
+    const int ITEMS_PER_PAGE = 20;
+
+    string selectedStoredProfile;
+    public string SelectedStoredProfile
     {
-        get => selectedItemPage;
+        get => selectedStoredProfile;
         set
         {
-            if (Set(ref selectedItemPage, value))
+            if (Set(ref selectedStoredProfile, value) && File.Exists(value))
             {
-                RaisePropertyChanged(nameof(ParsedFilteredAppartments));
+                manager = new ParserManager(value);
+                LoadItems();
             }
         }
     }
 
-    public int ItemsTotalPages
-    {
-        get => (int)Math.Ceiling((double)ParsedAppartments.Count / ITEMS_PER_PAGE);
-    }
-
-    const int ITEMS_PER_PAGE = 20;
-
+    public ObservableCollection<string> StoredProfileFiles { get; set; } = new();
     public ObservableCollection<Appartment> ParsedAppartments { get; set; } = new();
+
     public IEnumerable<Appartment> ParsedFilteredAppartments
     {
-        get => ParsedAppartments.Skip(ITEMS_PER_PAGE * (SelectedItemPage - 1)).Take(ITEMS_PER_PAGE);
+        get => ParsedAppartments.Skip(ITEMS_PER_PAGE * (CurrentPage - 1)).Take(ITEMS_PER_PAGE);
     }
 
-    private readonly ParserManager manager;
+    private ParserManager manager;
 
     public ICommand StartParserCommand { get; }
     public ICommand MovePreviousCommand { get; }
@@ -101,18 +107,16 @@ public class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel()
     {
         StartParserCommand = new LambdaCommand(async e => await StartParser(), e => CurrentPage == 1);
-        MovePreviousCommand = new LambdaCommand(e => SelectedItemPage--, e => SelectedItemPage > 1);
-        MoveNextCommand = new LambdaCommand(e => SelectedItemPage++, e => SelectedItemPage < ItemsTotalPages - 1);
-        manager = new ParserManager();
+        MovePreviousCommand = new LambdaCommand(e => CurrentPage--, e => CurrentPage > 1);
+        MoveNextCommand = new LambdaCommand(e => CurrentPage++, e => CurrentPage < TotalPages - 1);
 
-        LoadItems();
-
-        ParsedAppartments.CollectionChanged += (o, e) => RaisePropertyChanged(nameof(ItemsTotalPages));
-        RaisePropertyChanged(nameof(ItemsTotalPages));
+        LoadStoredFilesList();
     }
 
     private async Task StartParser()
     {
+        ParsedAppartments.Clear();
+
         try
         {
             var progress =
@@ -122,6 +126,9 @@ public class MainWindowViewModel : ViewModelBase
                     TotalPages = v.Item2;
                 });
 
+            string fileName = DateTime.Now.Date.ToString("yyyyMMdd") + $"_{minimumPrice / 1000}k-{maximumPrice / 1000}k.json";
+            manager = new ParserManager(fileName);
+
             await manager.Parse(
                 minPrice: MinimumPrice, maxPrice: MaximumPrice,
                 minArea: MinimumArea, maxArea: MaximumArea,
@@ -129,6 +136,7 @@ public class MainWindowViewModel : ViewModelBase
                 roomsCount: LivingRoomsCount,
                 progress);
 
+            LoadStoredFilesList();
             LoadItems();
         }
         catch (Exception ex)
@@ -142,11 +150,34 @@ public class MainWindowViewModel : ViewModelBase
 
     }
 
+    private void LoadStoredFilesList()
+    {
+        StoredProfileFiles.Clear();
+
+        var source = Directory.GetFiles(Path.GetDirectoryName(this.GetType().Assembly.Location), "*.json")
+            .Select(f => new FileInfo(f))
+            .Where(fi => Regex.IsMatch(fi.Name, @"^\d{8}_(.*)\.json$"))
+            .OrderByDescending(fi => fi.CreationTime)
+            .Select(fi => fi.Name)
+            .ToArray();
+
+        foreach (var file in source)
+        {
+            StoredProfileFiles.Add(file);
+        }
+        SelectedStoredProfile = StoredProfileFiles.FirstOrDefault();
+    }
+
     private void LoadItems()
     {
+        ParsedAppartments.Clear();
+
         foreach (var product in manager.appartments)
         {
             ParsedAppartments.Add(product);
         }
+
+        TotalPages = (int)Math.Ceiling((double)ParsedAppartments.Count / ITEMS_PER_PAGE);
+        CurrentPage = 1;
     }
 }

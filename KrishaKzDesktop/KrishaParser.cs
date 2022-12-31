@@ -82,15 +82,15 @@ public partial class KrishaParser
 
             await Task.Delay(TimeSpan.FromSeconds(1.25));
 
-            if (currentPage >= 5)
-            {
-                break;
-            }
+
 
             currentPage++;
 
+            progress?.Report(Tuple.Create(currentPage, totalPages));
+
         } while (currentPage <= totalPages);
 
+        progress?.Report(Tuple.Create(0, totalPages));
 
         return list;
     }

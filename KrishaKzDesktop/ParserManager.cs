@@ -11,7 +11,7 @@ namespace KrishaKzDesktop;
 
 public class ParserManager
 {
-    readonly string fileName = "products.json";
+    readonly string fileName;
 
     KrishaParser parser = new KrishaParser();
     JsonSerializerSettings jsonSettings = new JsonSerializerSettings()
@@ -21,8 +21,9 @@ public class ParserManager
 
     public List<Appartment> appartments { get; private set; }
 
-    public ParserManager()
+    public ParserManager(string? fileName)
     {
+        this.fileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
         Load();
     }
 

@@ -51,8 +51,16 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-            <Expander Header="Фильтр поиска парсера" IsExpanded="False">
+            <Expander
+                Margin="10,20"
+                Background="LightGray"
+                Header="Фильтр поиска парсера"
+                IsExpanded="False">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -83,9 +91,11 @@
                             <TextBlock Text="{Binding MaximumPrice, FallbackValue=0}" />
                         </StackPanel>
                         <mah:RangeSlider
+                            LargeChange="10000"
                             LowerValue="{Binding MinimumPrice, UpdateSourceTrigger=PropertyChanged}"
                             Maximum="500000"
                             Minimum="50000"
+                            SmallChange="1000"
                             UpperValue="{Binding MaximumPrice, UpdateSourceTrigger=PropertyChanged}" />
                     </DockPanel>
 
@@ -135,70 +145,109 @@
                 </Grid>
             </Expander>
 
-            <Grid Grid.Row="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+            <Expander
+                Grid.Column="1"
+                Margin="10,20"
+                Background="LightGray"
+                Header="Сохраненные профили"
+                IsExpanded="False">
+                <ListBox ItemsSource="{Binding StoredProfileFiles}" SelectedValue="{Binding SelectedStoredProfile}" />
+            </Expander>
 
-                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                    <Button
-                        BorderBrush="#FFC9F2"
-                        Command="{Binding MovePreviousCommand}"
-                        Content="Предыдущая страница" />
-                    <TextBlock
-                        Margin="8,4"
-                        HorizontalAlignment="Center"
-                        FontSize="20"
-                        FontWeight="Bold">
-                        Галерея
-                    </TextBlock>
-                    <Button
-                        BorderBrush="#FFC9F2"
-                        Command="{Binding MoveNextCommand}"
-                        Content="Следующая страница" />
-                </StackPanel>
+            <Border
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                Margin="0,20,0,0"
+                BorderBrush="Gray"
+                BorderThickness="0,2,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
 
-                <ScrollViewer Grid.Row="1">
-                    <ItemsControl
-                        ItemsSource="{Binding ParsedFilteredAppartments}"
-                        ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                        ScrollViewer.VerticalScrollBarVisibility="Visible">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Margin="8,4" Padding="4">
-                                    <Grid>
-                                        <Button
-                                            HorizontalAlignment="Right"
-                                            VerticalAlignment="Top"
-                                            Panel.ZIndex="99"
-                                            Background="Transparent"
-                                            BorderBrush="Transparent"
-                                            Command="{Binding OpenInBrowserCommand}"
-                                            FontSize="18"
-                                            Foreground="Blue"
-                                            ToolTip="{Binding Name}">
-                                            Ссылка
-                                        </Button>
-                                        <Image
-                                            Width="280"
-                                            Height="175"
-                                            Source="{Binding PreviewImage}" />
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    IsItemsHost="True" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                    </ItemsControl>
-                </ScrollViewer>
-            </Grid>
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                        <Button
+                            BorderBrush="#FFC9F2"
+                            Command="{Binding MovePreviousCommand}"
+                            Content="Предыдущая страница" />
+                        <TextBlock
+                            Margin="8,4"
+                            HorizontalAlignment="Center"
+                            FontSize="20"
+                            FontWeight="Bold">
+                            Галерея
+                        </TextBlock>
+                        <Button
+                            BorderBrush="#FFC9F2"
+                            Command="{Binding MoveNextCommand}"
+                            Content="Следующая страница" />
+                    </StackPanel>
+
+                    <ScrollViewer Grid.Row="1" Background="#575751">
+                        <ItemsControl
+                            ItemsSource="{Binding ParsedFilteredAppartments}"
+                            ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                            ScrollViewer.VerticalScrollBarVisibility="Visible">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Margin="8,4"
+                                        BorderBrush="#2C5F58"
+                                        BorderThickness="2"
+                                        CornerRadius="2">
+                                        <Grid>
+                                            <Button
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Top"
+                                                Panel.ZIndex="99"
+                                                Background="Transparent"
+                                                BorderBrush="Transparent"
+                                                Command="{Binding OpenInBrowserCommand}"
+                                                FontSize="18"
+                                                Foreground="Blue"
+                                                ToolTip="{Binding Name}">
+                                                Ссылка
+                                            </Button>
+                                            <TextBlock
+                                                Width="280"
+                                                Padding="4,8"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Bottom"
+                                                Panel.ZIndex="99"
+                                                Background="Black"
+                                                FontSize="12"
+                                                Foreground="Yellow"
+                                                Opacity="0.75"
+                                                Text="{Binding Name}" />
+                                            <Image
+                                                Width="280"
+                                                Height="175"
+                                                Source="{Binding PreviewImage}" />
+                                            <Grid.Effect>
+                                                <DropShadowEffect
+                                                    BlurRadius="6"
+                                                    Direction="230"
+                                                    Opacity="0.4"
+                                                    ShadowDepth="6"
+                                                    Color="Black" />
+                                            </Grid.Effect>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        IsItemsHost="True" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
         </Grid>
 
         <Grid
